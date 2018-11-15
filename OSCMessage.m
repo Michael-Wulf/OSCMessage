@@ -3,9 +3,9 @@ classdef OSCMessage < handle
     %   Detailed explanation goes here
     
     properties (GetAccess = public, SetAccess = protected)
-        address;
-        tagTypeList;
-        
+        address      = "";      % OSC address
+        typeTagList  = cell(0); % 
+        argumentList = cell(0); % 
     end
     
     methods
