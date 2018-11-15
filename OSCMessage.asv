@@ -37,8 +37,6 @@ classdef OSCMessage < handle
         end
         
         function addAttribute(obj, type, attribute)
-            
-            if
         end
         
         function addInt32(obj, argInt32)
