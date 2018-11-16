@@ -9,17 +9,64 @@ classdef OSCMessage < handle
     end
     
     methods
-        function obj = OSC(varargin)
+        function obj = OSCMessage(varargin)
             %OSC Construct an instance of this class
+            
+            if (nargin == 0)
+                % Empty OSCMessage...
+                return;
+                
+            elseif (nargin == 1)
+                % OSCMessage as byte array specified
+                byteArray = varargin{1};
+                
+                validateattributes(byteArray, {'uint8'}, {'vector'}, 'OSCMessage', 'byteArray');
+                
+                % Find position of the slash
+                idSlash = find(byteArray == '/', 1);
+                
+                if (isempty(idSlash))
+                    error('Specified byteArray does not contain the OSC message start symbol ''/''!');
+                end
+                
+                if (idSlash == 1)
+                    dataLength = length(byteArray);
+                    
+                elseif (idSlash == 5)
+                    temp = byteArray(1:(idSlash-1));
+                    temp = dec2hex(temp,2);
+                    temp = sprintf('%s', temp);
+                    dataLength = hex2dec(temp);
+                    
+                    payloadLen = length(byteArray-idSlash+1);
+                    
+                    if ( dataLength > payloadLen )
+                        warning('Specified data length to high!');
+                        dataLength = payloadLen;
+                    end
+                    
+                    byteArray = byteArray(idSlash:end);
+
+                else
+                    error('Unsopported OSC message format! Slash position > 5?!?');
+                end
+                
+                idTypeTag = find(byteArray == ',', 1);
+                obj.address = char(byteArray(2:(idTypeTag-1)));
+                obj.address = erase(obj.address, char(0));
+                
+                
+            elseif ( nargin == 3)
+                % address, typeTagList and attributeList specified
+                
+                
+            else
+                % Not supported number of arguments!
+                error('Number of arguments not supported!')
+            end
 
         end
-        
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
-        end
-        
+                
         function setAddress(obj, argAddress)
             %SETADDRESS Set the address property of this OSCMessage instance
             % Address must end with a null termination
@@ -37,11 +84,19 @@ classdef OSCMessage < handle
         end
         
         function addAttribute(obj, type, attribute)
+            % 
+            %
             
-            if
+            if (nargin < 3)
+                error('A type and an attribute must be specified!')
+            end
+            
+            
         end
         
         function addInt32(obj, argInt32)
+            
+            
         end
         
         function addFloat(obj, argFloat)
