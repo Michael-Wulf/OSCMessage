@@ -1,5 +1,5 @@
-classdef OSCTypes < uint8
-    %OSCTYPES Enum-class for some (not all) OSC types
+classdef OSCTypeSize < uint8
+    %OSCTYPES Enum-class for the lengsome (not all) OSC types
     % See http://opensoundcontrol.org/node/3/ for an overview of all OSC
     % types
     %
@@ -9,8 +9,7 @@ classdef OSCTypes < uint8
     % type = OSCTypes.Int32;
     % 
     % % create a Float32
-    % type = OSCTypes(uint8('f'));
-    % type = OSCTypes.fromChar('f');
+    % type = OSCTypes('f');
     % 
     % % Compare
     % if (type.toChar() == 'f')
@@ -30,26 +29,12 @@ classdef OSCTypes < uint8
     % --------------------------------------------------------------------------
     
     enumeration
-        Int32      (105) % ('i') Int32 OSC type 
-        Float32    (102) % ('f') Float32 OSC type
-        OscString  (115) % ('s') OSC-String OSC type
-        Int64      (104) % ('h') Int64 OSC type
-        OscTimetag (116) % ('t') OSC-timetag type
-        Double     (100) % ('d') Int32 OSC type
-        Ascii32     (99) % ('c') Int32 OSC type
-    end
-    
-    methods
-        
-        function c = toChar(obj)
-            c = char(uint8(obj));
-        end
-    end
-    
-    methods (Static)
-        function oscType = fromChar(value)
-            oscType = OSCTypes(uint8(value));
-        end
+        Int32      (4) % 4 byte, 32-bit
+        Float32    (4) % 4 byte, 32-bit
+        OscString  (1) % 1 byte,  8-bit
+        Int64      (8) % 8 byte, 64-bit
+        OscTimetag (8) % 8 byte, 64-bit
+        Double     (8) % 8 byte, 64-bit
+        Ascii32    (4) % 4 byte, 32-bit
     end
 end
-
