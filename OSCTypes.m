@@ -36,7 +36,7 @@ classdef OSCTypes < uint8
         Int64      (104) % ('h') Int64 OSC type
         OscTimetag (116) % ('t') OSC-timetag type
         Double     (100) % ('d') Int32 OSC type
-        Ascii32     (99) % ('c') Int32 OSC type
+        Ascii32     (99) % ('c') ASCII32 OSC type
     end
     
     methods
