@@ -1,6 +1,19 @@
 classdef OSCMessage < handle
-    %OSC Summary of this class goes here
-    %   Detailed explanation goes here
+    %OSC Message class
+    % See http://opensoundcontrol.org/node/3/ for an overview of all OSC
+    % types
+    %
+    % --------------------------------------------------------------------------
+    % Author:  Michael Wulf
+    %          Cold Spring Harbor Laboratory
+    %          Kepecs Lab
+    %          One Bungtown Road
+    %          Cold Spring Harboor
+    %          NY 11724, USA
+    %
+    % Date:    11/15/2018
+    % Version: 1.0.0
+    % --------------------------------------------------------------------------
     
     properties (GetAccess = public, SetAccess = protected)
         address       = '';      % OSC address
@@ -10,7 +23,7 @@ classdef OSCMessage < handle
     
     methods
         function obj = OSCMessage(varargin)
-            %OSC Construct an instance of this class
+            %OSCMESSAGE Construct an instance of this class
             
             if (nargin == 0)
                 % Empty OSCMessage...
@@ -123,6 +136,9 @@ classdef OSCMessage < handle
                 
                 for cntr = 1:1:length(typeTags)
                     try
+                        % Cast the current byte as an uint8 value and use this
+                        % to get the corresponding OSCType from the enum class
+                        % OSCTypes!
                         obj.typeTagList = [obj.typeTagList {OSCTypes(uint8(typeTags(cntr)))}];
                     catch
                         error('Unknown OSC TypeTag %s', typeTags(cntr));
@@ -139,7 +155,7 @@ classdef OSCMessage < handle
                     % Get next OSCTypeTag
                     currType = obj.typeTagList{cntr};
                     
-                    % Get Size of TypeTag
+                    % Get size of TypeTag
                     numBytes = double(OSCTypeSize(currType.char));
                     
                     newAttribute = [];
@@ -401,7 +417,7 @@ classdef OSCMessage < handle
                 end
                 
                 % Store the values before leaving the constructor
-                obj.address = addr;
+                obj.address       = addr;
                 obj.typeTagList   = types;
                 obj.attributeList = attributes;
                 
