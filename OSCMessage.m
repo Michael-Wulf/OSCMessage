@@ -1,7 +1,8 @@
 classdef OSCMessage < handle
-    %OSC Message class
-    % See http://opensoundcontrol.org/node/3/ for an overview of all OSC
-    % types
+    %OSC Message Simple MATLAB implementation of the OSC Message format
+    % 
+    % See http://opensoundcontrol.org/node/3/ for an overview of the structure
+    % of an OSCMessage
     %
     % --------------------------------------------------------------------------
     % Author:  Michael Wulf
@@ -45,7 +46,7 @@ classdef OSCMessage < handle
                 end
                 
                 if (idSlash == 1)
-                    dataLength = length(byteArray);
+                    dataLength = length(byteArray); %#ok<NASGU>
                     
                 elseif (idSlash > 1)
                     % Check if something was sent before the slash -> message lengt?!?
@@ -63,7 +64,7 @@ classdef OSCMessage < handle
                     
                     if ( dataLength > msgLen )
                         warning('Specified data length to high!');
-                        dataLength = msgLen;
+                        dataLength = msgLen; %#ok<NASGU>
                     end
                     
                     % Remove everything before the slash...
@@ -76,7 +77,7 @@ classdef OSCMessage < handle
                     error('Unsopported OSC message format! Slash position > 5?!?');
                 end
                 
-                % Find the position of TypeTag idicator ','
+                % Find the position of Type Tag idicator ','
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 idTypeTag = find(byteArray == ',', 1);
                 
@@ -93,7 +94,7 @@ classdef OSCMessage < handle
                     obj.address = erase(obj.address, char(0));
                 end
                 
-                % Remove everything before the TypeTag...
+                % Remove everything before the Type Tag...
                 byteArray = byteArray(idTypeTag:end);
                 
                 % Find the first zero element!
@@ -103,7 +104,7 @@ classdef OSCMessage < handle
                     %no data given!
                     return;
                 else
-                    % The length of the typeTag portion (including ',' and
+                    % The length of the type Tag portion (including ',' and
                     % null-terminating character) must be a multiple of 4
                     % bytes!
                     
@@ -123,11 +124,11 @@ classdef OSCMessage < handle
                     end
                     
                     if ( idFirstDataByte > length(byteArray) )
-                        error('OSC message has a worng format! TypeTags specified but no data transmitted!');
+                        error('OSC message has a worng format! Type Tags specified but no data transmitted!');
                     end
                 end
                 
-                % Get the TypeTags
+                % Get the Type Tags
                 typeTags = byteArray(2:idFirstZero-1);
                 
                 if isempty(typeTags)
@@ -141,21 +142,21 @@ classdef OSCMessage < handle
                         % OSCTypes!
                         obj.typeTagList = [obj.typeTagList {OSCTypes(uint8(typeTags(cntr)))}];
                     catch
-                        error('Unknown OSC TypeTag %s', typeTags(cntr));
+                        error('Unknown OSC Type Tag %s', typeTags(cntr));
                     end
                 end
                 
-                % remove ervything except the data portion...
+                % remove everything except the data portion...
                 byteArray = byteArray(idFirstDataByte:end);
                 
                 for cntr = 1:1:length(obj.typeTagList)
                     % Get number of remaining bytes
                     remainingBytes = length(byteArray);
                     
-                    % Get next OSCTypeTag
+                    % Get next OSC Type Tag
                     currType = obj.typeTagList{cntr};
                     
-                    % Get size of TypeTag
+                    % Get size of Type Tag
                     numBytes = double(OSCTypeSize(currType.char));
                     
                     newAttribute = [];
@@ -292,7 +293,7 @@ classdef OSCMessage < handle
                     
                     % Check that current type is of class OSCTypes...
                     if ( ~strcmpi(class(currType), 'OSCTypes') )
-                        error('TypeTags must be specified as cell array of OSCTypes attributes1');
+                        error('Type Tags must be specified as cell array of OSCTypes attributes!');
                     end
                     
                     % Now check that attribute and type match!
@@ -445,65 +446,124 @@ classdef OSCMessage < handle
         end
         
         function addInt32(obj, argInt32)
-            % Add an Int32 attribute to the OSCMessage instance
-            if (~(isa(argInt32, 'int32')))
-                warning('Specified attribute is not an int32 value! To avoid truncation or loss of precision, convert it to int32 before calling this function!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.Int32, argInt32);
         end
         
         function addInt64(obj, argInt64)
-            % Add an Int64 attribute to the OSCMessage instance
-            if (~(isa(argInt64, 'int64')))
-                warning('Specified attribute is not an int64 value! To avoid truncation or loss of precision, convert it to int64 before calling this function!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.Int64, argInt64);
         end
         
         function addFloat(obj, argFloat)
-            % Add a single/float attribute to the OSCMessage instance
-            if (~(isa(argFloat, 'single')))
-                warning('Specified attribute is not a single/float value! To avoid truncation or loss of precision, convert it to single/float before calling this function!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.Float32, argFloat);
         end
         
         function addDouble(obj, argDouble)
-            % Add a double attribute to the OSCMessage instance
-            if (~(isa(argDouble, 'double')))
-                warning('Specified attribute is not a double value! To avoid truncation or loss of precision, convert it to double before calling this function!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.Double, argDouble);
         end
         
         function addAscii32(obj, argAscii)
-            % Add a char attribute to the OSCMessage instance
-            if (~(isa(argAscii, 'char')))
-                warning('Specified attribute is not a char value! To avoid truncation or loss of precision, convert it to char before calling this function!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.Ascii32, argAscii);
         end
         
         function addOscTimetag(obj, argOscTimetag)
-            % Add a OSCTimetag attribute to the OSCMessage instance
-            if (~(strcmpi(argOscTimetag, 'OSCTimetag')))
-                error('Specified attribute is not an OSCTimetag object!');
-            end
+            % Set the attribute
             obj.setAttribute(OSCTypes.OscTimetag, argOscTimetag);
         end
         
         function addString(obj, argString)
-            
+            % Set the attribute
+            obj.setAttribute(OSCTypes.OscString, argString);
         end
         
         function addAttribute(obj, type, attribute)
-            % Set
-            %
+            % Check and set attribute
             
             if (nargin < 3)
                 error('A type and an attribute must be specified!')
             end
             
+            if (numel(type) ~= 1)
+                error('Type must be a scalar value!')
+            end
+            
+            if (numel(attribute) ~= 1)
+                if (~iscahr(attribute))
+                    error('Attribute must be a scalar value or string (char-vector)!')
+                end
+            end
+            
+            % Depending on the type cast the attribute
+            switch(type)
+                case OSCTypes.Int32
+                    % Add an Int32 attribute to the OSCMessage instance
+                    if (~(isa(attribute, 'int32')))
+                        warning('Specified attribute is not an int32 value! To avoid truncation or loss of precision, convert it to int32 before calling this function!');
+                    end
+                    % Cast to int32
+                    newAttribute = int32(attribute);
+                    
+                case OSCTypes.Int64
+                    % Add an Int64 attribute to the OSCMessage instance
+                    if (~(isa(argInt64, 'int64')))
+                        warning('Specified attribute is not an int64 value! To avoid truncation or loss of precision, convert it to int64 before calling this function!');
+                    end
+                    % Cast to int64
+                    newAttribute = int64(attribute);
+                    
+                case OSCTypes.Float32
+                    % Add a single/float attribute to the OSCMessage instance
+                    if (~(isa(argFloat, 'single')))
+                        warning('Specified attribute is not a single/float value! To avoid truncation or loss of precision, convert it to single/float before calling this function!');
+                    end
+                    % Cast to single
+                    newAttribute = single(attribute);
+                    
+                case OSCTypes.Double
+                    % Add a double attribute to the OSCMessage instance
+                    if (~(isa(argDouble, 'double')))
+                        warning('Specified attribute is not a double value! To avoid truncation or loss of precision, convert it to double before calling this function!');
+                    end
+                    % Cast to double
+                    newAttribute = double(attribute);
+                    
+                case OSCTypes.Ascii32
+                    % Add a char attribute to the OSCMessage instance
+                    if (~(isa(argAscii, 'char') || isa(argAscii, 'uint8')))
+                        warning('Specified attribute is not a char/uint8 value! To avoid truncation or loss of precision, convert it to char before calling this function!');
+                    end
+                    % Cast to char/uint8
+                    newAttribute = uint8(attribute);
+                    
+                case OSCTypes.OscString
+                    % Add a char attribute to the OSCMessage instance
+                    if (~(isa(argAscii, 'char') || isa(argAscii, 'uint8')))
+                        warning('Specified attribute is not a char/uint8 value! To avoid truncation or loss of precision, convert it to char before calling this function!');
+                    end
+                    % Cast to char/uint8
+                    newAttribute = uint8(attribute);
+                    
+                case OSCTypes.OscTimetag
+                    % Add a OSCTimetag attribute to the OSCMessage instance
+                    if (~isa(argOscTimetag, 'OSCTimetag'))
+                        error('Specified attribute is not an OSCTimetag object!');
+                    end
+                    % Submit attribute
+                    newAttribute = attribute;
+                    
+                otherwise
+                    error('Unknown OSC Type Tag!');
+            end
+            
+            % Add type tag to type tag list
+            obj.typeTagList = [obj.typeTagList {type}];
+            
+            % Add attribute to attribute list
+            obj.attributeList = [obj.attributeList {newAttribute}];
             
         end
         
@@ -527,6 +587,11 @@ classdef OSCMessage < handle
                 % The last character of the string muss be the Null-char!
                 if ( tempAddress(end) ~= 0 )
                     tempAddress = [tempAddress char(0)];
+                else
+                    % If last character was already a null char, check if there
+                    % are multiple null chars!
+                    firstNull = find(tempAddress == 0, 1);
+                    tempAddress = tempAddress(1:firstNull);
                 end
                 
                 % Now check the 32-bit allignment of the address
@@ -558,9 +623,114 @@ classdef OSCMessage < handle
             
             % Add typeTags
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            byteArray(end+1) = uint8(',');
+            %byteArray(end+1) = uint8(',');
             
+            % Get number of type tags
+            numTypeTags   = length(obj.typeTagList);
             
+            % Get number of attributes
+            numAttributes = length(obj.attributeList);
+            
+            % Number of type tags and attributes must match
+            if (numTypeTags ~= numAttributes)
+                % Should not be the case...
+                error('Something went wrong! The number of Type Tags does not match the number of attributes!')
+            end
+            
+            % If no type tags are specified, leave the function...
+            if (numTypeTags == 0)
+                return;
+            end
+            
+            % Iterate through all the type tags
+            %-------------------------------------------------------------------
+            typeArrayLength = (numTypeTags + 1) + 4 - mod((numTypeTags+1), 4);
+            typeArray    = uint8(zeros(1, typeArrayLength));
+            
+            % Add separator
+            typeArray(1) = uint8(',');
+            
+            attrArray = [];
+            
+            for cntr = 1:1:numTypeTags
+                % Get current OSC type tag
+                currType = obj.typeTagList{cntr};
+                typeArray(cntr+1) = currType.toChar();
+                
+                % Get corresponding attribute
+                currAttr = obj.attributeList{cntr};
+                
+                % Check that the attribute is not empty!
+                if (isempty(currAttr))
+                    error('Attribute #%d is empty!?!', cntr);
+                end
+                
+                if ( (numel(currAttr) > 1) && (currType ~= OSCTypes.OscString) )
+                    warning('Only scalar values and strings (char arrays) allowed! Taking first element of attribute 3%d!', cntr);
+                    currAttr = currAttr(1);
+                end
+                
+                % Create dummy placeholder for byte structure of that atribute
+                currBytes = []; %#ok<NASGU>
+                
+                switch(attrArray)
+                    case OSCTypes.Int32
+                        currBytes = fliplr(typecast( int32(currAttr), 'uint8'));
+                        
+                    case OSCTypes.Int64
+                        currBytes = fliplr(typecast( int64(currAttr), 'uint8'));
+                        
+                    case OSCTypes.Float32
+                        currBytes = fliplr(typecast(single(currAttr), 'uint8'));
+                        
+                    case OSCTypes.Double
+                        currBytes = fliplr(typecast(double(currAttr), 'uint8'));
+                        
+                    case OSCTypes.Ascii32
+                        currBytes    = uint8(zeros(1,4));
+                        currBytes(4) = uint8(char(currAttr));
+                        
+                    case OSCTypes.OscTimetag
+                        if (~isa(currAttr, 'OSCTimetag'))
+                            error('Type tag #%d specifies an OSCTimetag but attribute is of class %s!', cntr, class(currAttr));
+                        end
+                        % Convert to byte array
+                        currBytes = currAttr.toByteArray();
+                        
+                    case OSCTypes.OscString
+                        if (~isa(currAttr, 'char'))
+                            error('Type tag #%d specifies an OSCString (char-vector) but attribute is of class %s!', cntr, class(currAttr));
+                        end
+                        
+                        % Append one null character
+                        tempString = [currAttr char(0)];
+                        
+                        % Check that only one null char is at the end
+                        firstNull  = find(tempString == 0, 1);
+                        
+                        % No check that length (including null charater) is a
+                        % multiple of 4...
+                        tempString = tempString(1:firstNull);
+                        strAppend  = 4 - mod(length(tempString), 4);
+                        
+                        if (strAppend > 0)
+                            tempString = [tempString uint8(zeros(1, strAppend))]; %#ok<AGROW>
+                        end
+                        
+                        % Convert to byte array
+                        currBytes = uint8(tempString);
+                        
+                        
+                    otherwise
+                        error('Something went wrong! The given OSCType is invalid! How can that happen?!?');
+                end
+                
+                % Append attribute array
+                attrArray = [attrArray currBytes]; %#ok<AGROW>
+            end
+            
+            % Combine arrays before leaving this method
+            byteArray = [byteArray typeArray attrArray];
         end
     end
 end

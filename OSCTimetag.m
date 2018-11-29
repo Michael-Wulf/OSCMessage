@@ -149,24 +149,33 @@ classdef OSCTimetag
                 end
             elseif ( (nargin == 6) || (nargin == 7) )
                 
-                y    = varargin{1}; % Year
-                m    = varargin{2}; % Month
-                d    = varargin{3}; % Day
-                h    = varargin{4}; % Hour
-                min  = varargin{5}; % Minute
-                sec  = varargin{6}; % Seconds
+                year  = varargin{1}; % Year
+                month = varargin{2}; % Month
+                day   = varargin{3}; % Day
+                hour  = varargin{4}; % Hour
+                min   = varargin{5}; % Minute
+                sec   = varargin{6}; % Seconds
                 if (nargin == 7)
                     msec = varargin{7}; % Milliseconds
                 else
                     msec = 0;
                 end
                 
+                % Validate the attributes...
+                validateattributes(year, {'numeric'}, {'scalar', '>=', 1900}, 'OSCTimetag', 'year');
+                validateattributes(month, {'numeric'}, {'scalar', '>=', 1, '<=', 12}, 'OSCTimetag', 'month');
+                validateattributes(day, {'numeric'}, {'scalar', '>=', 1, '<=', 31}, 'OSCTimetag', 'day');
+                validateattributes(hour, {'numeric'}, {'scalar', '>=', 0, '<=', 23}, 'OSCTimetag', 'hour');
+                validateattributes(min, {'numeric'}, {'scalar', '>=', 0, '<=', 59}, 'OSCTimetag', 'min');
+                validateattributes(sec, {'numeric'}, {'scalar', '>=', 0, '<=', 59}, 'OSCTimetag', 'sec');
+                validateattributes(msec, {'numeric'}, {'scalar', '>=', 0, '<', 1000}, 'OSCTimetag', 'msec');
+                
                 % Input as string for datetime function
                 try
                     % Call MATLAB functions datetime & datenum to get the number of
                     % days (including fractional part) of given date/time
                     % since January 0, 0000
-                    tempTimestamp = datenum(datetime(y, m, d, h, min, sec, msec));
+                    tempTimestamp = datenum(datetime(year, month, day, hour, min, sec, msec));
                 catch
                     error('Could not recognize the date/time format! Specified values for year, month, day, hour, minut, second, and millisecond must be given as scalar values (e.g. OSCTimetag(2018, 12, 24, 13, 12, ,25, 125)');
                 end
