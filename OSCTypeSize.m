@@ -24,7 +24,7 @@ classdef OSCTypeSize < uint8
     %          Cold Spring Harboor
     %          NY 11724, USA
     %
-    % Date:    11/15/2018
+    % Date:    12/13/2018
     % Version: 1.0.0
     % --------------------------------------------------------------------------
     

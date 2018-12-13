@@ -12,8 +12,8 @@ classdef OSCMessage < handle
     %          Cold Spring Harboor
     %          NY 11724, USA
     %
-    % Date:    11/15/2018
-    % Version: 1.0.0
+    % Date:    12/13/2018
+    % Version: 1.0.1
     % --------------------------------------------------------------------------
     
     properties (GetAccess = public, SetAccess = protected)
@@ -34,6 +34,11 @@ classdef OSCMessage < handle
                 byteArray = varargin{1};
                 
                 validateattributes(byteArray, {'uint8'}, {'vector'}, 'OSCMessage', 'byteArray');
+                
+                % Check that byteArray is a row vector!
+                if (size(byteArray, 1) > 1)
+                    byteArray = byteArray';
+                end
                 
                 % Get address out of the byteArray
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -198,7 +203,7 @@ classdef OSCMessage < handle
                                 %    temp = temp - (2^63);
                                 %end
                                 %newAttribute = int64(temp);
-                                newAttribute = typecast(fliplr(bytes), 'int32');
+                                newAttribute = typecast(fliplr(bytes), 'int64');
                                 
                             case OSCTypes.Float32
                                 % 32-bit single precision floating point numbers
@@ -209,7 +214,7 @@ classdef OSCMessage < handle
                                 
                             case OSCTypes.Double
                                 % 64-bit double precision floating point numbers
-                                newAttribute = typecast(fliplr(bytes), 'single');
+                                newAttribute = typecast(fliplr(bytes), 'double');
                             
                             case OSCTypes.Ascii32
                                 % ASCII character - right aligned in 32-bit
@@ -446,43 +451,58 @@ classdef OSCMessage < handle
         end
         
         function addInt32(obj, argInt32)
+            %ADDINT32 Add an int32 value to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.Int32, argInt32);
+            obj.addAttribute(OSCTypes.Int32, argInt32);
         end
         
         function addInt64(obj, argInt64)
+            %ADDINT64 Add an int64 value to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.Int64, argInt64);
+            obj.addAttribute(OSCTypes.Int64, argInt64);
         end
         
         function addFloat(obj, argFloat)
+            %ADDFLOAT Add a single/float value to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.Float32, argFloat);
+            obj.addAttribute(OSCTypes.Float32, argFloat);
         end
         
         function addDouble(obj, argDouble)
+            %ADDDOUBLE Add a double value to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.Double, argDouble);
+            obj.addAttribute(OSCTypes.Double, argDouble);
         end
         
         function addAscii32(obj, argAscii)
+            %ADDASCII32 Add an ASCII character value to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.Ascii32, argAscii);
+            obj.addAttribute(OSCTypes.Ascii32, argAscii);
         end
         
         function addOscTimetag(obj, argOscTimetag)
+            %ADDOSCTIMETAG Add an OSCTimetag to the message
             % Set the attribute
-            obj.setAttribute(OSCTypes.OscTimetag, argOscTimetag);
+            obj.addAttribute(OSCTypes.OscTimetag, argOscTimetag);
         end
         
         function addString(obj, argString)
+            %ADDSTRING Add a string to the message
+            
             % Set the attribute
-            obj.setAttribute(OSCTypes.OscString, argString);
+            obj.addAttribute(OSCTypes.OscString, argString);
         end
         
         function addAttribute(obj, type, attribute)
-            % Check and set attribute
+            %ADDATRIBUTE Add an attribute to the message.
+            % Consider valid OSCTypes for adding values!
             
+            % Check and set attribute
             if (nargin < 3)
                 error('A type and an attribute must be specified!')
             end
@@ -492,7 +512,7 @@ classdef OSCMessage < handle
             end
             
             if (numel(attribute) ~= 1)
-                if (~iscahr(attribute))
+                if (~ischar(attribute))
                     error('Attribute must be a scalar value or string (char-vector)!')
                 end
             end
@@ -509,7 +529,7 @@ classdef OSCMessage < handle
                     
                 case OSCTypes.Int64
                     % Add an Int64 attribute to the OSCMessage instance
-                    if (~(isa(argInt64, 'int64')))
+                    if (~(isa(attribute, 'int64')))
                         warning('Specified attribute is not an int64 value! To avoid truncation or loss of precision, convert it to int64 before calling this function!');
                     end
                     % Cast to int64
@@ -517,7 +537,7 @@ classdef OSCMessage < handle
                     
                 case OSCTypes.Float32
                     % Add a single/float attribute to the OSCMessage instance
-                    if (~(isa(argFloat, 'single')))
+                    if (~(isa(attribute, 'single')))
                         warning('Specified attribute is not a single/float value! To avoid truncation or loss of precision, convert it to single/float before calling this function!');
                     end
                     % Cast to single
@@ -525,7 +545,7 @@ classdef OSCMessage < handle
                     
                 case OSCTypes.Double
                     % Add a double attribute to the OSCMessage instance
-                    if (~(isa(argDouble, 'double')))
+                    if (~(isa(attribute, 'double')))
                         warning('Specified attribute is not a double value! To avoid truncation or loss of precision, convert it to double before calling this function!');
                     end
                     % Cast to double
@@ -533,7 +553,7 @@ classdef OSCMessage < handle
                     
                 case OSCTypes.Ascii32
                     % Add a char attribute to the OSCMessage instance
-                    if (~(isa(argAscii, 'char') || isa(argAscii, 'uint8')))
+                    if (~(isa(attribute, 'char') || isa(argAscii, 'uint8')))
                         warning('Specified attribute is not a char/uint8 value! To avoid truncation or loss of precision, convert it to char before calling this function!');
                     end
                     % Cast to char/uint8
@@ -541,15 +561,15 @@ classdef OSCMessage < handle
                     
                 case OSCTypes.OscString
                     % Add a char attribute to the OSCMessage instance
-                    if (~(isa(argAscii, 'char') || isa(argAscii, 'uint8')))
+                    if (~(isa(attribute, 'char') || isa(argAscii, 'uint8')))
                         warning('Specified attribute is not a char/uint8 value! To avoid truncation or loss of precision, convert it to char before calling this function!');
                     end
                     % Cast to char/uint8
-                    newAttribute = uint8(attribute);
+                    newAttribute = char(attribute);
                     
                 case OSCTypes.OscTimetag
                     % Add a OSCTimetag attribute to the OSCMessage instance
-                    if (~isa(argOscTimetag, 'OSCTimetag'))
+                    if (~isa(attribute, 'OSCTimetag'))
                         error('Specified attribute is not an OSCTimetag object!');
                     end
                     % Submit attribute
@@ -567,10 +587,21 @@ classdef OSCMessage < handle
             
         end
         
+        function clearAttributes(obj)
+            %CLEARATTRIBUTES Clears the attribute part of the message (payload)
+            
+            % Just re-initialze the cell arrays 
+            obj.typeTagList   = cell(0); % List of TypeTags
+            obj.attributeList = cell(0); % List of attributes
+            
+        end % clearAttributes
+        
         function byteArray = toByteArray(obj)
-            % Convert the OSCMessage object to a byte array to be sent via
-            % TCP/UDP...
-            byteArray = uint8();
+            %TOBYTEARRAY Convert the OSCMessage object into a byte array to be
+            %transmitted to the receiver (e.g. via TCP/UDP)
+            
+            % Create an aempty byte array
+            byteArray = uint8([]);
             
             % Add '/'
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -673,7 +704,7 @@ classdef OSCMessage < handle
                 % Create dummy placeholder for byte structure of that atribute
                 currBytes = []; %#ok<NASGU>
                 
-                switch(attrArray)
+                switch(currType)
                     case OSCTypes.Int32
                         currBytes = fliplr(typecast( int32(currAttr), 'uint8'));
                         

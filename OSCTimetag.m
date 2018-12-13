@@ -3,6 +3,17 @@ classdef OSCTimetag
     % An OSC timetag timestamp stores the passed seconds since Jan-01-1900 00:00:00
     % as two separate uint32 values (whole seconds and fractional seconds with a
     % precision of 2^(-32))
+    % --------------------------------------------------------------------------
+    % Author:  Michael Wulf
+    %          Cold Spring Harbor Laboratory
+    %          Kepecs Lab
+    %          One Bungtown Road
+    %          Cold Spring Harboor
+    %          NY 11724, USA
+    %
+    % Date:    12/13/2018
+    % Version: 1.0.0
+    % --------------------------------------------------------------------------
     
     properties
         seconds   = uint32(0);

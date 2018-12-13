@@ -1,6 +1,21 @@
 function binary = fp2bin(flpoint, format)
 %FP2BIN Convert a floating point number into it's binary representation
-%   Detailed explanation goes here
+%
+% Usage:
+% x = 3.25;
+% s = fp2bin(x, 'single');
+%
+% ------------------------------------------------------------------------------
+% Author:  Michael Wulf
+%          Cold Spring Harbor Laboratory
+%          Kepecs Lab
+%          One Bungtown Road
+%          Cold Spring Harboor
+%          NY 11724, USA
+%
+% Date:    12/13/2018
+% Version: 1.0.1
+% ------------------------------------------------------------------------------
 
 if ( nargin < 1)
     error('No floating point number give!');
