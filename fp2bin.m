@@ -5,16 +5,14 @@ function binary = fp2bin(flpoint, format)
 % x = 3.25;
 % s = fp2bin(x, 'single');
 %
-% ------------------------------------------------------------------------------
+% --------------------------------------------------------------------------
 % Author:  Michael Wulf
-%          Cold Spring Harbor Laboratory
+%          Washington University in St. Louis
 %          Kepecs Lab
-%          One Bungtown Road
-%          Cold Spring Harboor
-%          NY 11724, USA
 %
-% Date:    12/13/2018
-% Version: 1.0.1
+% Date:    03/16/2022
+% Version: 1.0.2
+% Github:  https://github.com/Michael-Wulf/OSCMessage
 % ------------------------------------------------------------------------------
 
 if ( nargin < 1)
@@ -52,14 +50,14 @@ elseif ( strcmpi(format, 'double') )
     % It is not possible to just do it the same way as for the single/float
     % format! The problem is, that especcially larger values can't be
     % stored accurate enough! hex2dec tries to convert a hex representation
-    % (as an integer value!!!) into the double format. Up until 2^53, integer 
+    % (as an integer value!!!) into the double format. Up until 2^53, integer
     % values can be stored precisely, but from 2^53 the double format will even
     % lose precisions for integers! From 2^53 to 2^54 only the even numbers
     % can be stored. From 2^42 to 2^55 only multiples of 4 can be stored.
     % Than multiples of 8 and so on. Distance between two adjacent numbers
     % in the range between 2^n and 2^(n+1) can be calculated by 2^(n-52)!
     %
-    % Solution: 
+    % Solution:
     % To avoid the previously described circumstance, we can split it into
     % 2x32-bit values!
     

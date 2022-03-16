@@ -6,14 +6,12 @@ classdef OSCMessage < handle
     %
     % --------------------------------------------------------------------------
     % Author:  Michael Wulf
-    %          Cold Spring Harbor Laboratory
+    %          Washington University in St. Louis
     %          Kepecs Lab
-    %          One Bungtown Road
-    %          Cold Spring Harboor
-    %          NY 11724, USA
-    %
-    % Date:    12/13/2018
+    % 
+    % Date:    03/16/2022
     % Version: 1.0.1
+    % Github:  https://github.com/Michael-Wulf/OSCMessage
     % --------------------------------------------------------------------------
     
     properties (GetAccess = public, SetAccess = protected)
